@@ -6,17 +6,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AppCompatActivity
-import android.text.Html
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.mapbox.services.android.navigation.v5.navigation.NavigationConstants
 import com.mapbox.services.android.navigation.v5.utils.DistanceFormatter
 import com.mapbox.services.android.navigation.v5.utils.LocaleUtils
@@ -40,8 +36,6 @@ import com.mapbox.vision.mobile.core.models.position.VehicleState
 import com.mapbox.vision.mobile.core.models.road.LaneDirection
 import com.mapbox.vision.mobile.core.models.road.LaneEdgeType
 import com.mapbox.vision.mobile.core.models.road.RoadDescription
-import com.mapbox.vision.mobile.core.utils.SystemInfoUtils
-import com.mapbox.vision.mobile.core.utils.snapdragon.SupportedSnapdragonBoards
 import com.mapbox.vision.performance.ModelPerformance
 import com.mapbox.vision.performance.ModelPerformanceConfig
 import com.mapbox.vision.performance.ModelPerformanceMode
@@ -53,7 +47,6 @@ import com.mapbox.vision.safety.core.models.CollisionObject
 import com.mapbox.vision.safety.core.models.RoadRestrictions
 import com.mapbox.vision.view.VisualizationMode
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -287,14 +280,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (!SupportedSnapdragonBoards.isBoardSupported(SystemInfoUtils.getSnpeSupportedBoard())) {
-            val text =
-                Html.fromHtml("The device is not supported, you need <b>Snapdragon-powered</b> device with <b>OpenCL</b> support, more details at <b>https://www.mapbox.com/android-docs/vision/overview/</b>")
-            Toast.makeText(this, text, Toast.LENGTH_LONG).show()
-            finish()
-            return
-        }
-
         soundsPlayer = SoundsPlayer(this)
 
         if (!allPermissionsGranted() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -353,9 +338,9 @@ class MainActivity : AppCompatActivity() {
     private fun tryToInitVisionManager() {
         if (isPermissionsGranted && !visionManagerWasInit) {
             VisionManager.create()
+            VisionManager.setVideoSourceListener(vision_view)
             VisionManager.start(visionEventsListener)
             VisionManager.setModelPerformanceConfig(appModelPerformanceConfig)
-            VisionManager.setVideoSourceListener(vision_view)
 
             VisionSafetyManager.create(VisionManager, visionSafetyListener)
 
