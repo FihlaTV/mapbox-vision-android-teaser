@@ -10,13 +10,13 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <uses-feature android:name="android.hardware.location.gps" />
-    <uses-feature android:name="android.hardware.location.network" />
+    <uses-feature android:name="android.hardware.location.gps"/>
+    <uses-feature android:name="android.hardware.location.network"/>
 
-    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature android:name="android.hardware.camera.autofocus"/>
 
     <application
         android:name=".DemoApplication"
@@ -31,24 +31,31 @@
         <activity
             android:name="com.mapbox.vision.examples.activity.main.MainActivity"
             android:screenOrientation="landscape">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        </activity>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+        <activity
+            android:name="com.mapbox.vision.examples.activity.ar.ArReplayNavigationActivity"
+            android:screenOrientation="landscape"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
         </activity>
 
         <activity
             android:name="com.mapbox.vision.examples.activity.map.MapActivity"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"/>
 
         <activity
             android:name="com.mapbox.vision.examples.activity.ar.ArMapActivity"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"/>
 
         <activity
             android:name="com.mapbox.vision.examples.activity.ar.ArNavigationActivity"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"/>
 
     </application>
 

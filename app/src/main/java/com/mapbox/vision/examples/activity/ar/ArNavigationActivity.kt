@@ -37,8 +37,7 @@ import com.mapbox.vision.performance.ModelPerformanceRate
 import com.mapbox.vision.utils.VisionLogger
 import kotlinx.android.synthetic.main.activity_ar_navigation.*
 
-class ArNavigationActivity : AppCompatActivity(), RouteListener, ProgressChangeListener,
-    OffRouteListener {
+class ArNavigationActivity : AppCompatActivity(), RouteListener, ProgressChangeListener, OffRouteListener {
 
     companion object {
         private var TAG = ArNavigationActivity::class.java.simpleName
@@ -118,9 +117,9 @@ class ArNavigationActivity : AppCompatActivity(), RouteListener, ProgressChangeL
                 performance = ModelPerformance.On(ModelPerformanceMode.FIXED, ModelPerformanceRate.LOW)
             )
         )
-        VisionManager.setVideoSourceListener(mapbox_ar_view)
+        VisionManager.setVideoSourceListener(ar)
 
-        VisionArManager.create(VisionManager, mapbox_ar_view)
+        VisionArManager.create(VisionManager, ar)
 
         setRoute(intent.getSerializableExtra(EXTRA_ROUTE) as DirectionsRoute)
     }
@@ -180,7 +179,7 @@ class ArNavigationActivity : AppCompatActivity(), RouteListener, ProgressChangeL
 
     private fun DirectionsRoute.getRoutePoints(): Array<RoutePoint> {
         val routePoints = arrayListOf<RoutePoint>()
-        legs()?.forEach {leg ->
+        legs()?.forEach { leg ->
             leg.steps()?.forEach { step ->
                 val maneuverPoint = RoutePoint(
                     GeoCoordinate(

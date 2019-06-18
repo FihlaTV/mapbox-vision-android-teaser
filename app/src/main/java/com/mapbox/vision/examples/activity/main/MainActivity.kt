@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.text.Html
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +19,7 @@ import androidx.core.content.ContextCompat
 import com.mapbox.services.android.navigation.v5.navigation.NavigationConstants
 import com.mapbox.services.android.navigation.v5.utils.DistanceFormatter
 import com.mapbox.services.android.navigation.v5.utils.LocaleUtils
-import com.mapbox.vision.VisionManager
+import com.mapbox.vision.VisionReplayManager
 import com.mapbox.vision.examples.R
 import com.mapbox.vision.examples.activity.ar.ArMapActivity
 import com.mapbox.vision.examples.activity.map.MapActivity
@@ -39,6 +40,7 @@ import com.mapbox.vision.mobile.core.models.position.VehicleState
 import com.mapbox.vision.mobile.core.models.road.LaneDirection
 import com.mapbox.vision.mobile.core.models.road.LaneEdgeType
 import com.mapbox.vision.mobile.core.models.road.RoadDescription
+import com.mapbox.vision.mobile.core.models.world.WorldDescription
 import com.mapbox.vision.mobile.core.utils.SystemInfoUtils
 import com.mapbox.vision.mobile.core.utils.snapdragon.SupportedSnapdragonBoards
 import com.mapbox.vision.performance.ModelPerformance
@@ -54,6 +56,7 @@ import com.mapbox.vision.safety.core.models.RoadRestrictions
 import com.mapbox.vision.utils.VisionLogger
 import com.mapbox.vision.view.VisualizationMode
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -81,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     private var appMode: AppMode = AppMode.Detection
 
     private var isPermissionsGranted = false
-    private var visionManagerWasInit = false
+    private var visionReplayManagerWasInit = false
     private lateinit var soundsPlayer: SoundsPlayer
 
     private var country = Country.Unknown
@@ -124,6 +127,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        override fun onWorldDescriptionUpdated(worldDescription: WorldDescription) {
+            super.onWorldDescriptionUpdated(worldDescription)
+        }
+
         override fun onVehicleStateUpdated(vehicleState: VehicleState) {
             lastSpeed = vehicleState.speed
         }
@@ -134,7 +141,7 @@ class MainActivity : AppCompatActivity() {
 
         @SuppressLint("SetTextI18n")
         override fun onUpdateCompleted() {
-            val frameStatistics = VisionManager.getFrameStatistics()
+            val frameStatistics = VisionReplayManager.getFrameStatistics()
             runOnUiThread {
                 when (appModelPerformanceConfig) {
                     is ModelPerformanceConfig.Merged -> {
@@ -208,7 +215,7 @@ class MainActivity : AppCompatActivity() {
                         safety_mode.hide()
                         calibration_progress.show()
                         calibration_progress.text = getString(
-                            R.string.calibration_progress,
+                            com.mapbox.vision.examples.R.string.calibration_progress,
                             (calibrationProgress * 100).toInt()
                         )
                     }
@@ -217,7 +224,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val speedLimitTranslation by lazy {
-            resources.getDimension(R.dimen.speed_limit_translation)
+            resources.getDimension(com.mapbox.vision.examples.R.dimen.speed_limit_translation)
         }
 
         override fun onRoadRestrictionsUpdated(roadRestrictions: RoadRestrictions) {
@@ -311,9 +318,9 @@ class MainActivity : AppCompatActivity() {
     private fun onPermissionsGranted() {
         isPermissionsGranted = true
 
-        signSize = resources.getDimension(R.dimen.dp64).toInt()
-        lineHeight = resources.getDimension(R.dimen.dp40).toInt()
-        margin = resources.getDimension(R.dimen.dp8).toInt()
+        signSize = resources.getDimension(com.mapbox.vision.examples.R.dimen.dp64).toInt()
+        lineHeight = resources.getDimension(com.mapbox.vision.examples.R.dimen.dp40).toInt()
+        margin = resources.getDimension(com.mapbox.vision.examples.R.dimen.dp8).toInt()
 
         back.setOnClickListener { onBackClick() }
         segm_container.setOnClickListener { setSegmentationMode() }
@@ -331,16 +338,18 @@ class MainActivity : AppCompatActivity() {
         driver_score_button_container.setOnClickListener { setDriveScoreMode() }
         root.setOnLongClickListener {
             if (fps_info_container.visibility == View.GONE) {
+                VisionReplayManager.pause()
                 fps_info_container.show()
             } else {
                 fps_info_container.hide()
+                VisionReplayManager.resume()
             }
             return@setOnLongClickListener true
 
         }
         fps_info_container.hide()
 
-        tryToInitVisionManager()
+        tryToInitVisionReplayManager()
     }
 
     override fun onRequestPermissionsResult(
@@ -354,32 +363,37 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun tryToInitVisionManager() {
-        if (isPermissionsGranted && !visionManagerWasInit) {
-            VisionManager.create()
-            VisionManager.start(visionEventsListener)
-            VisionManager.setModelPerformanceConfig(appModelPerformanceConfig)
-            VisionManager.setVideoSourceListener(vision_view)
+    private fun tryToInitVisionReplayManager() {
+        if (isPermissionsGranted && !visionReplayManagerWasInit) {
+            VisionReplayManager.create(
+                "${Environment.getExternalStorageDirectory().absolutePath}/Telemetry/" +
+                        "default"
+            )
+            VisionReplayManager.start(visionEventsListener)
+            VisionReplayManager.setModelPerformanceConfig(appModelPerformanceConfig)
+            VisionReplayManager.setVideoSourceListener(vision_view)
 
-            VisionSafetyManager.create(VisionManager, visionSafetyListener)
+            VisionReplayManager.setProgress(TimeUnit.SECONDS.toMillis(30))
 
-            visionManagerWasInit = true
+            VisionSafetyManager.create(VisionReplayManager, visionSafetyListener)
+
+            visionReplayManagerWasInit = true
         }
     }
 
     override fun onStart() {
         super.onStart()
-        tryToInitVisionManager()
+        tryToInitVisionReplayManager()
     }
 
     override fun onStop() {
         super.onStop()
 
-        if (isPermissionsGranted && visionManagerWasInit) {
+        if (isPermissionsGranted && visionReplayManagerWasInit) {
             VisionSafetyManager.destroy()
-            VisionManager.stop()
-            VisionManager.destroy()
-            visionManagerWasInit = false
+            VisionReplayManager.stop()
+            VisionReplayManager.destroy()
+            visionReplayManagerWasInit = false
         }
         soundsPlayer.stop()
     }
@@ -422,21 +436,21 @@ class MainActivity : AppCompatActivity() {
 
         fun LaneEdgeType.toDrawableId(isForward: Boolean = false): Int = when (this) {
             LaneEdgeType.Curb -> if (isForward) {
-                R.drawable.ic_right_curb
+                com.mapbox.vision.examples.R.drawable.ic_right_curb
             } else {
-                R.drawable.ic_left_curb
+                com.mapbox.vision.examples.R.drawable.ic_left_curb
             }
             LaneEdgeType.Construction -> TODO()
-            LaneEdgeType.MarkupDashed -> R.drawable.ic_half_lane
-            LaneEdgeType.MarkupDoubleSolid -> R.drawable.ic_separator_double_lane
-            LaneEdgeType.MarkupSolid -> R.drawable.ic_separator_lane
-            LaneEdgeType.Unknown -> R.drawable.ic_unknown_lane
+            LaneEdgeType.MarkupDashed -> com.mapbox.vision.examples.R.drawable.ic_half_lane
+            LaneEdgeType.MarkupDoubleSolid -> com.mapbox.vision.examples.R.drawable.ic_separator_double_lane
+            LaneEdgeType.MarkupSolid -> com.mapbox.vision.examples.R.drawable.ic_separator_lane
+            LaneEdgeType.Unknown -> com.mapbox.vision.examples.R.drawable.ic_unknown_lane
         }
 
         fun LaneDirection.toDrawableId() = when (this) {
-            LaneDirection.Backward -> R.drawable.ic_arrow
-            LaneDirection.Forward -> R.drawable.ic_arrow_forward
-            LaneDirection.Reverse -> R.drawable.ic_arrow_reversed
+            LaneDirection.Backward -> com.mapbox.vision.examples.R.drawable.ic_arrow
+            LaneDirection.Forward -> com.mapbox.vision.examples.R.drawable.ic_arrow_forward
+            LaneDirection.Reverse -> com.mapbox.vision.examples.R.drawable.ic_arrow_reversed
             LaneDirection.Unknown -> TODO()
         }
 
@@ -450,7 +464,7 @@ class MainActivity : AppCompatActivity() {
 
             val directionImageView = getImageView()
             if (index == roadDescription.currentLaneIndex) {
-                directionImageView.setImageResource(R.drawable.ic_blue_arrow)
+                directionImageView.setImageResource(com.mapbox.vision.examples.R.drawable.ic_blue_arrow)
             } else {
                 directionImageView.setImageResource(lane.direction.toDrawableId())
             }
