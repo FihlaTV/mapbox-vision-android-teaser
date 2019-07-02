@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.text.Html
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import com.mapbox.services.android.navigation.v5.utils.DistanceFormatter
 import com.mapbox.services.android.navigation.v5.utils.LocaleUtils
 import com.mapbox.vision.VisionManager
 import com.mapbox.vision.examples.R
+import com.mapbox.vision.examples.RecordingView
 import com.mapbox.vision.examples.activity.ar.ArMapActivity
 import com.mapbox.vision.examples.activity.map.MapActivity
 import com.mapbox.vision.examples.models.UiSign
@@ -54,6 +56,8 @@ import com.mapbox.vision.safety.core.models.RoadRestrictions
 import com.mapbox.vision.utils.VisionLogger
 import com.mapbox.vision.view.VisualizationMode
 import kotlinx.android.synthetic.main.activity_main.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -96,6 +100,7 @@ class MainActivity : AppCompatActivity() {
     private val visionEventsListener = object : VisionEventsListener {
 
         override fun onCountryUpdated(country: Country) {
+            println("Country $country")
             this@MainActivity.country = country
         }
 
@@ -331,6 +336,7 @@ class MainActivity : AppCompatActivity() {
             return@setOnLongClickListener true
 
         }
+        recording_view.setOnClickListener { toggleRecording() }
         fps_performance_view.hide()
 
         tryToInitVisionManager()
@@ -346,6 +352,9 @@ class MainActivity : AppCompatActivity() {
             onPermissionsGranted()
         }
     }
+
+    private val BASE_SESSION_PATH = "${Environment.getExternalStorageDirectory().absolutePath}/Telemetry"
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ssZ", Locale.US)
 
     private fun tryToInitVisionManager() {
         if (isPermissionsGranted && !visionManagerWasInit) {
@@ -365,11 +374,25 @@ class MainActivity : AppCompatActivity() {
         tryToInitVisionManager()
     }
 
+    private fun toggleRecording() {
+        when (recording_view.state) {
+            RecordingView.State.NotRecording -> {
+                VisionManager.startRecording("$BASE_SESSION_PATH/${dateFormat.format(Date(System.currentTimeMillis()))}")
+                recording_view.state = RecordingView.State.Recording
+            }
+            RecordingView.State.Recording -> {
+                VisionManager.stopRecording()
+                recording_view.state = RecordingView.State.NotRecording
+            }
+        }
+    }
+
     override fun onStop() {
         super.onStop()
 
         if (isPermissionsGranted && visionManagerWasInit) {
             VisionSafetyManager.destroy()
+            VisionManager.stopRecording()
             VisionManager.stop()
             VisionManager.destroy()
             visionManagerWasInit = false

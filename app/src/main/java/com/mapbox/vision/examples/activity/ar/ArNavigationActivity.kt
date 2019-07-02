@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
+import android.os.Environment
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -36,6 +37,9 @@ import com.mapbox.vision.performance.ModelPerformanceMode
 import com.mapbox.vision.performance.ModelPerformanceRate
 import com.mapbox.vision.utils.VisionLogger
 import kotlinx.android.synthetic.main.activity_ar_navigation.*
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class ArNavigationActivity : AppCompatActivity(), RouteListener, ProgressChangeListener,
     OffRouteListener {
@@ -125,10 +129,31 @@ class ArNavigationActivity : AppCompatActivity(), RouteListener, ProgressChangeL
         setRoute(intent.getSerializableExtra(EXTRA_ROUTE) as DirectionsRoute)
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        startRecordingLoop()
+    }
+
+    private val BASE_SESSION_PATH = "${Environment.getExternalStorageDirectory().absolutePath}/Telemetry/minsk"
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ssZ", Locale.US)
+
+    private fun startRecordingLoop() {
+        mapbox_ar_view.postDelayed(
+            {
+                VisionManager.stopRecording()
+                VisionManager.startRecording("$BASE_SESSION_PATH/${dateFormat.format(Date(System.currentTimeMillis()))}")
+                startRecordingLoop()
+            },
+            TimeUnit.MINUTES.toMillis(5)
+        )
+    }
+
     override fun onPause() {
         super.onPause()
         VisionArManager.destroy()
 
+        VisionManager.stopRecording()
         VisionManager.stop()
         VisionManager.destroy()
 
