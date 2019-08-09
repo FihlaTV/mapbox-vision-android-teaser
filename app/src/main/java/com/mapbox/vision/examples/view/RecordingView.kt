@@ -1,4 +1,4 @@
-package com.mapbox.vision.examples
+package com.mapbox.vision.examples.view
 
 import android.content.Context
 import android.util.AttributeSet
@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.mapbox.vision.examples.R
 import kotlinx.android.synthetic.main.view_recording.view.*
 
 class RecordingView @JvmOverloads constructor(
@@ -29,7 +30,8 @@ class RecordingView @JvmOverloads constructor(
         )
     }
 
-    var state : State = State.NotRecording
+    var state : State =
+        State.NotRecording
         set(value) {
             field = value
             recording_text.setText(value.textId)

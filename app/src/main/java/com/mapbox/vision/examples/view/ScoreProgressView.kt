@@ -1,4 +1,4 @@
-package com.mapbox.vision.examples
+package com.mapbox.vision.examples.view
 
 import android.animation.ArgbEvaluator
 import android.content.Context
@@ -6,14 +6,15 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
-import androidx.annotation.ColorInt
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.transition.Slide
-import androidx.transition.TransitionManager
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.ColorInt
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.transition.Slide
+import androidx.transition.TransitionManager
+import com.mapbox.vision.examples.R
 import com.mapbox.vision.examples.utils.dpToPx
 import com.mapbox.vision.examples.utils.hide
 import com.mapbox.vision.examples.utils.show
@@ -113,7 +114,12 @@ constructor(
 
     fun plusScore(amount: Int) = onNewScore(DriverScore.Positive(amount))
 
-    fun minusScore(amount: Int, reason: String) = onNewScore(DriverScore.Negative(amount, reason))
+    fun minusScore(amount: Int, reason: String) = onNewScore(
+        DriverScore.Negative(
+            amount,
+            reason
+        )
+    )
 
     private fun onNewScore(nextScore: DriverScore) {
         val delta = (animationWillEndAt - System.currentTimeMillis()).let { if (it < 0) 0 else it }

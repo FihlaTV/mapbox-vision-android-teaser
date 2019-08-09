@@ -1,4 +1,4 @@
-package com.mapbox.vision.examples
+package com.mapbox.vision.examples.view
 
 import android.content.Context
 import android.graphics.*

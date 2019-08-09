@@ -91,7 +91,7 @@
             android:textSize="20sp"
             tools:text="50 m"/>
 
-        <com.mapbox.vision.examples.SafetyModeView
+        <com.mapbox.vision.examples.view.SafetyModeView
             android:id="@+id/safety_mode"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
@@ -117,7 +117,7 @@
 
     </FrameLayout>
 
-    <com.mapbox.vision.examples.FpsPerformanceView
+    <com.mapbox.vision.examples.view.FpsPerformanceView
         android:id="@+id/fps_performance_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -130,7 +130,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.mapbox.vision.examples.RecordingView
+    <com.mapbox.vision.examples.view.RecordingView
         android:id="@+id/recording_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

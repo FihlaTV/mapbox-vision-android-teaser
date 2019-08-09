@@ -1,4 +1,4 @@
-package com.mapbox.vision.examples
+package com.mapbox.vision.examples.view
 
 import android.content.Context
 import android.graphics.*
@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.DimenRes
 import android.util.AttributeSet
 import android.view.View
+import com.mapbox.vision.examples.R
 import com.mapbox.vision.mobile.core.models.frame.ImageSize
 import com.mapbox.vision.safety.core.models.CollisionObject
 

@@ -1,10 +1,11 @@
-package com.mapbox.vision.examples
+package com.mapbox.vision.examples.view
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import com.mapbox.vision.examples.R
 import com.mapbox.vision.examples.utils.hide
 import com.mapbox.vision.examples.utils.show
 import com.mapbox.vision.mobile.core.models.FrameStatistics

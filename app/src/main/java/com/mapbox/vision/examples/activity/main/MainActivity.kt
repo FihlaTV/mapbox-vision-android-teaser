@@ -21,7 +21,7 @@ import com.mapbox.services.android.navigation.v5.utils.DistanceFormatter
 import com.mapbox.services.android.navigation.v5.utils.LocaleUtils
 import com.mapbox.vision.VisionManager
 import com.mapbox.vision.examples.R
-import com.mapbox.vision.examples.RecordingView
+import com.mapbox.vision.examples.view.RecordingView
 import com.mapbox.vision.examples.activity.ar.ArMapActivity
 import com.mapbox.vision.examples.activity.map.MapActivity
 import com.mapbox.vision.examples.models.UiSign
