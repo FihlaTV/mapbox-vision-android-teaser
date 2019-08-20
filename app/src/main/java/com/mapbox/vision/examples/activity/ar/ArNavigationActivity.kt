@@ -30,10 +30,7 @@ import com.mapbox.vision.ar.core.models.Route
 import com.mapbox.vision.ar.core.models.RoutePoint
 import com.mapbox.vision.examples.R
 import com.mapbox.vision.mobile.core.interfaces.VisionEventsListener
-import com.mapbox.vision.mobile.core.models.FrameSegmentation
-import com.mapbox.vision.mobile.core.models.detection.FrameDetections
 import com.mapbox.vision.mobile.core.models.position.GeoCoordinate
-import com.mapbox.vision.mobile.core.models.position.VehicleState
 import com.mapbox.vision.performance.ModelPerformance
 import com.mapbox.vision.performance.ModelPerformanceConfig
 import com.mapbox.vision.performance.ModelPerformanceMode
@@ -41,7 +38,8 @@ import com.mapbox.vision.performance.ModelPerformanceRate
 import com.mapbox.vision.utils.VisionLogger
 import kotlinx.android.synthetic.main.activity_ar_navigation.*
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class ArNavigationActivity : AppCompatActivity(), RouteListener, ProgressChangeListener,
@@ -120,23 +118,23 @@ class ArNavigationActivity : AppCompatActivity(), RouteListener, ProgressChangeL
 
         VisionManager.create()
         VisionManager.start(object : VisionEventsListener {
-            override fun onFrameDetectionsUpdated(frameDetections: FrameDetections) {
-                runOnUiThread {
-                    mapbox_ar_view.setFrameDetections(frameDetections)
-                }
-            }
-
-            override fun onFrameSegmentationUpdated(frameSegmentation: FrameSegmentation) {
-                runOnUiThread {
-                    mapbox_ar_view.setFrameSegmentation(frameSegmentation)
-                }
-            }
-
-            override fun onVehicleStateUpdated(vehicleState: VehicleState) {
-                runOnUiThread {
-                    mapbox_ar_view.setSpeed(vehicleState.speed)
-                }
-            }
+//            override fun onFrameDetectionsUpdated(frameDetections: FrameDetections) {
+//                runOnUiThread {
+//                    mapbox_ar_view.setFrameDetections(frameDetections)
+//                }
+//            }
+//
+//            override fun onFrameSegmentationUpdated(frameSegmentation: FrameSegmentation) {
+//                runOnUiThread {
+//                    mapbox_ar_view.setFrameSegmentation(frameSegmentation)
+//                }
+//            }
+//
+//            override fun onVehicleStateUpdated(vehicleState: VehicleState) {
+//                runOnUiThread {
+//                    mapbox_ar_view.setSpeed(vehicleState.speed)
+//                }
+//            }
         })
         VisionManager.setModelPerformanceConfig(
             ModelPerformanceConfig.Merged(
