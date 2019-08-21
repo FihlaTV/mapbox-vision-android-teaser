@@ -31,6 +31,11 @@
         <activity
             android:name="com.mapbox.vision.examples.activity.main.MainActivity"
             android:screenOrientation="landscape">
+        </activity>
+
+        <activity
+            android:name="com.mapbox.vision.examples.activity.main.RecordingActivity"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
