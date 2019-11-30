@@ -9,6 +9,11 @@ import androidx.core.content.ContextCompat
 import com.mapbox.vision.VisionReplayManager
 import com.mapbox.vision.common.view.BaseTeaserActivity
 import com.mapbox.vision.common.view.show
+import com.mapbox.vision.performance.ModelPerformance
+import com.mapbox.vision.performance.ModelPerformanceConfig
+import com.mapbox.vision.performance.ModelPerformanceMode
+import com.mapbox.vision.performance.ModelPerformanceRate
+import com.mapbox.vision.performance.ModelType
 import com.mapbox.vision.safety.VisionSafetyManager
 import com.mapbox.vision.view.VisionView
 import java.io.File
@@ -58,10 +63,20 @@ class ReplayActivity : BaseTeaserActivity(), SessionsFragment.SessionChangeListe
             return false
         }
 
-        VisionReplayManager.create(sessionPath)
+        VisionReplayManager.create(
+            sessionPath,
+            modelType = ModelType.NEW
+        )
+        VisionReplayManager.setModelPerformanceConfig(
+            ModelPerformanceConfig.Merged(
+                performance = ModelPerformance.On(
+                    mode = ModelPerformanceMode.FIXED,
+                    rate = ModelPerformanceRate.FIXED(5f)
+                )
+            )
+        )
         VisionReplayManager.visionEventsListener = visionEventsListener
         VisionReplayManager.start()
-        VisionReplayManager.setModelPerformanceConfig(appModelPerformanceConfig)
         visionView.setVisionManager(VisionReplayManager)
 
         VisionSafetyManager.create(VisionReplayManager)
